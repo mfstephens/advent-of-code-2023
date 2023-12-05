@@ -1,6 +1,6 @@
 import Foundation
 
-struct Day03 {
+struct Day3 {
   struct PartPosition: Hashable {
     let row: Int
     let cols: Range<Int>
