@@ -1,9 +1,14 @@
 import Foundation
 
-struct Position: Hashable {
-  let row, col: Int
+public struct Position: Hashable {
+  public let row, col: Int
   
-  static func +(lhs: Position, rhs: Position) -> Position {
+  public init(row: Int, col: Int) {
+    self.row = row
+    self.col = col
+  }
+  
+  public static func +(lhs: Position, rhs: Position) -> Position {
     return .init(row: lhs.row + rhs.row, col: lhs.col + rhs.col)
   }
 }

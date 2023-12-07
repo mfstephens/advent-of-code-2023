@@ -1,15 +1,18 @@
-// swift-tools-version: 5.9
-// The swift-tools-version declares the minimum version of Swift required to build this package.
+// swift-tools-version:5.9
 
 import PackageDescription
 
 let package = Package(
     name: "advent-of-code-2023",
-    platforms: [.macOS(.v14)],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
-        .executableTarget(
-            name: "advent-of-code-2023"),
+      .executableTarget(name: "Day01", dependencies: ["Utilities"]),
+      .executableTarget(name: "Day02", dependencies: ["Utilities"]),
+      .executableTarget(name: "Day03", dependencies: ["Utilities"]),
+      .executableTarget(name: "Day04", dependencies: ["Utilities"]),
+      .executableTarget(name: "Day05", dependencies: ["Utilities"]),
+      .executableTarget(name: "Day06", dependencies: ["Utilities"]),
+      .executableTarget(name: "Day07", dependencies: ["Utilities"]),
+      .executableTarget(name: "Day08", dependencies: ["Utilities"]),
+      .target(name: "Utilities", dependencies: []),
     ]
 )
