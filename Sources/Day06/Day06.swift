@@ -9,19 +9,19 @@ struct Day06 {
     let input = readContentsOfFile(named: "Input.txt")!
     
     let rows = input.components(separatedBy: .newlines)
-        .map { row -> [Int] in
-            let components = row
-                .components(separatedBy: .decimalDigits.inverted)
-                .filter { !$0.isEmpty }
-            return ignoringSpaces
-            ? [Int(components.joined())!]
-            : components.compactMap { Int($0) }
-        }
-
+      .map { row -> [Int] in
+        let components = row
+          .components(separatedBy: .decimalDigits.inverted)
+          .filter { !$0.isEmpty }
+        return ignoringSpaces
+        ? [Int(components.joined())!]
+        : components.compactMap { Int($0) }
+      }
+    
     return zip(rows[0], rows[1])
       .map { .init(time: $0.0, distance: $0.1) }
   }
-
+  
   static func countWins(races: [Race]) -> Int {
     races
       .map { race in

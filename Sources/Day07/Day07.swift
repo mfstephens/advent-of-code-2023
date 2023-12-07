@@ -2,25 +2,25 @@ import Foundation
 
 struct Day07 {
   enum Card: Int, Comparable {
-    case two, three, four, five, six, seven, eight, nine, ten
-    case jack, queen, king, ace
+    case jack, two, three, four, five, six, seven, eight, nine, ten
+    case queen, king, ace
     
     init?(string: String) {
       switch string {
-        case "A": self = .ace
-        case "K": self = .king
-        case "Q": self = .queen
-        case "J": self = .jack
-        case "T": self = .ten
-        case "9": self = .nine
-        case "8": self = .eight
-        case "7": self = .seven
-        case "6": self = .six
-        case "5": self = .five
-        case "4": self = .four
-        case "3": self = .three
-        case "2": self = .two
-        default: return nil
+      case "A": self = .ace
+      case "K": self = .king
+      case "Q": self = .queen
+      case "J": self = .jack
+      case "T": self = .ten
+      case "9": self = .nine
+      case "8": self = .eight
+      case "7": self = .seven
+      case "6": self = .six
+      case "5": self = .five
+      case "4": self = .four
+      case "3": self = .three
+      case "2": self = .two
+      default: return nil
       }
     }
     
@@ -38,37 +38,44 @@ struct Day07 {
     case fourOfAKind // 1, 4
     case fiveOfAKind // 5
     
+    init?(pattern: [Int]) {
+      switch pattern {
+      case [1, 1, 1, 1, 1]: self = .highCard
+      case [1, 1, 1, 2]: self = .onePair
+      case [1, 2, 2]: self = .twoPair
+      case [1, 1, 3]: self = .threeOfAKind
+      case [2, 3]: self = .fullHouse
+      case [1, 4]: self = .fourOfAKind
+      case [5]: self = .fiveOfAKind
+      default: return nil
+      }
+    }
+    
     static func < (lhs: HandType, rhs: HandType) -> Bool {
       return lhs.rawValue < rhs.rawValue
     }
   }
   
   static func getHandType(cards: [Card]) -> HandType {
-    let pattern = cards
+    // edge case
+    if cards == Array(repeating: Card.jack, count: 5) {
+      return .fiveOfAKind
+    }
+    
+    var cardCounts = cards
       .reduce(into: [Card: Int]()) { partial, next in
         partial[next, default: 0] += 1
       }
+    
+    let jacks = cardCounts.removeValue(forKey: .jack)
+    let max = cardCounts.max(by: { ($0.value < $1.value) })
+    cardCounts[max!.key]! += jacks ?? 0
+    
+    let pattern = cardCounts
       .values
       .sorted()
     
-    switch pattern {
-    case [1, 1, 1, 1, 1]:
-      return .highCard
-    case [1, 1, 1, 2]:
-      return .onePair
-    case [1, 2, 2]:
-      return .twoPair
-    case [1, 1, 3]:
-      return .threeOfAKind
-    case [2, 3]:
-      return .fullHouse
-    case [1, 4]:
-      return .fourOfAKind
-    case [5]:
-      return .fiveOfAKind
-    default:
-      fatalError()
-    }
+    return HandType(pattern: pattern)!
   }
   
   struct Hand: Comparable {
@@ -107,7 +114,7 @@ struct Day07 {
       .components(separatedBy: .newlines)
   }
   
-  static func part1() -> Int {
+  static func part2() -> Int {
     parseHands(input: readInput())
       .sorted(by: <)
       .enumerated()
