@@ -52,8 +52,9 @@ folder_count=$(find "$sources_directory" -mindepth 1 -maxdepth 1 -type d | wc -l
     echo "import PackageDescription"
     echo ""
     echo "let package = Package("
-    echo "    name: \"advent-of-code-2023\","
-    echo "    targets: ["
+    echo "  name: \"advent-of-code-2023\","
+    echo "  platforms: [.macOS(.v14)],"
+    echo "  targets: ["
 } > Package.swift
 
 # Generate executable targets based on folders
@@ -62,14 +63,14 @@ for folder in "$sources_directory"/*/; do
   folder_name=$(basename "$folder")
   
   if [ "$folder_name" == "Utilities" ]; then
-    echo "      .target(name: \"$folder_name\", dependencies: [])," >> Package.swift
+    echo "    .target(name: \"$folder_name\", dependencies: [])," >> Package.swift
     else
-    echo "      .executableTarget(name: \"$folder_name\", dependencies: [\"Utilities\"])," >> Package.swift
+    echo "    .executableTarget(name: \"$folder_name\", dependencies: [\"Utilities\"])," >> Package.swift
     ((index++))
   fi
 done
 
 # Close the Package.swift content
-echo "    ]" >> Package.swift
+echo "  ]" >> Package.swift
 echo ")" >> Package.swift
 
