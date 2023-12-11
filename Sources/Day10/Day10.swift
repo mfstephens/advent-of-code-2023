@@ -2,6 +2,7 @@ import Foundation
 import Utilities
 
 struct Tile: Equatable, Hashable {
+  let symbol: String
   let position: Position
   var connections: [Position]
   let isStart: Bool
@@ -67,6 +68,24 @@ func connections(
   }
 }
 
+func connectionType(for position: Position, positions: [Position]) -> String {
+  switch positions {
+  case [position + .north, position + .south]:
+    return "|"
+  case [position + .east, position + .west]:
+    return "-"
+  case [position + .north, position + .east]:
+    return "L"
+  case [position + .north, position + .west]:
+    return "J"
+  case [position + .south, position + .west]:
+    return "7"
+  case [position + .south, position + .east]:
+    return "F"
+  default: fatalError()
+  }
+}
+
 typealias Grid = [[Tile]]
 
 func buildGrid(from input: [[String]]) -> Grid {
@@ -80,7 +99,11 @@ func buildGrid(from input: [[String]]) -> Grid {
             at: position,
             input: input
           )
-          return Tile(position: position, connections: connections, isStart: tile == "S")
+          var symbol = tile
+          if tile == "S" {
+            symbol = connectionType(for: position, positions: connections)
+          }
+          return Tile(symbol: symbol, position: position, connections: connections, isStart: tile == "S")
         }
       }
 }
@@ -115,56 +138,49 @@ func part1() -> Int {
   return Int(ceil(Double(loop.count)/2))
 }
 
-func groupByColDifference(of positions: [Position]) -> [[Position]] {
-    var result: [[Position]] = []
-    var currentGroup: [Position] = []
-    
-    for position in positions {
-        if let lastPosition = currentGroup.last, abs(position.col - lastPosition.col) > 1 {
-            result.append(currentGroup)
-            currentGroup = []
-        }
-        currentGroup.append(position)
-    }
-    
-    if !currentGroup.isEmpty {
-        result.append(currentGroup)
-    }
-    
-    return result
-}
-
 func part2() -> Int {
   let input = parseInput()
   let grid = buildGrid(from: input)
   let loop = findLoop(in: grid)
   
   var total = 0
-  for (row, line) in grid.enumerated() {
-    let line = line.enumerated().map { Position(row: row, col: $0.offset) }
-    let hits = Set(line).intersection(loop.map { $0.position })
-    var sorted = hits.sorted(by: { $0.col < $1.col })
-    let grouped = groupByColDifference(of: sorted)
-    print(grouped.count)
-    
-    for i in stride(from: 0, to: grouped.count - 1, by: 2) {
-      var current: Position
-      if grouped[i].count >= 2 {
-        current = grouped[i].last!
-      } else {
-        current = grouped[i].first!
+  for line in grid {
+    for tile in line {
+      guard !loop.contains(tile) else { continue }
+
+      let rayCast = (tile.position.col..<line.count)
+        .map { line[$0] }
+      let intersections = loop.intersection(rayCast)
+      let sides = intersections
+        .filter { $0.symbol == "|" }
+      
+      let corners = intersections
+        .filter {
+          $0.symbol == "7" ||
+          $0.symbol == "F" ||
+          $0.symbol == "L" ||
+          $0.symbol == "J"
+        }
+        .sorted(by: { $0.position.col < $1.position.col })
+      
+      var cornersIterator = corners.makeIterator()
+      var intersectionCount = sides.count
+      while let current = cornersIterator.next(),
+            let next = cornersIterator.next() {
+        switch (current.symbol, next.symbol) {
+        case ("F", "J"), ("L", "7"):
+          intersectionCount += 1
+        case ("L", "J"), ("F", "7"):
+          break
+        default:
+          print("\(current.symbol), \(next.symbol)")
+          break
+        }
       }
       
-      var next: Position
-      if grouped[i + 1].count >= 2 {
-        next = grouped[i + 1].first!
-      } else {
-        next = grouped[i + 1].last!
+      if !intersectionCount.isMultiple(of: 2) {
+        total += 1
       }
-      
-      guard i + 1 < grouped.count, (next.col - current.col) > 1 else { continue }
-//      print("adding: \(next.col - current.col - 1) from \(current.col) to \(next.col ) ")
-      total += next.col - current.col - 1
     }
   }
   return total
