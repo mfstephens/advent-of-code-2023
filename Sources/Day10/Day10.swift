@@ -16,16 +16,6 @@ extension Position {
   static let allDirections = [north, south, east, west]
 }
 
-extension Array where Element: Collection, Element.Index == Int {
-  subscript(pos: Position) -> Element.Element? {
-    get {
-      guard pos.row >= 0 && pos.row < count else { return nil }
-      guard pos.col >= 0 && pos.col < self[pos.row].count else { return nil }
-      return self[pos.row][pos.col]
-    }
-  }
-}
-
 func parseInput() -> [[String]] {
   readContentsOfFile(named: "Input.txt")!
     .components(separatedBy: .newlines)
