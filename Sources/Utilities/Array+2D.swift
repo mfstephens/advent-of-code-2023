@@ -20,7 +20,7 @@ public extension Array where Element: Collection, Element.Index == Int {
   
   func prettyPrinted() {
     for row in self {
-      print(row.map { "\($0)" }.joined(separator: ""))
+      print(row.map { "\($0)" }.joined(separator: "\t"))
     }
   }
 }
