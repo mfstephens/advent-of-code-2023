@@ -1,4 +1,3 @@
-import Algorithms
 import Foundation
 import Utilities
 
@@ -24,7 +23,7 @@ func canFill(springs: [String], groupLength: Int, startIndex: Int) -> Bool {
     return false
   }
   
-  // Make sure we aren't hitting a . i in the group
+  // Make sure we aren't hitting a . in the group
   for i in 0..<groupLength {
     if springs[startIndex + i] == "." {
       return false
@@ -92,33 +91,6 @@ func countArrangementsCached(springs: [String], groups: [Int], cache: inout [Cac
   return result
 }
 
-func countArrangements(in line: [String], matching pattern: [Int]) -> Int {
-  let unknowns = line.indices.filter { line[$0] == "?" }
-  let knowns = line.filter { $0 == "#" }
-  let totalBroken = pattern.reduce(0, +)
-  let missingBroken = totalBroken - knowns.count
-  var total = 0
-  for i in missingBroken..<unknowns.count {
-    var base = Array(repeating: "#", count: i)
-    let working = Array(repeating: ".", count: unknowns.count - i)
-    base.append(contentsOf: working)
-    for combo in base.uniquePermutations() {
-      var comboIterator = combo.makeIterator()
-      var arrangement = line
-      unknowns.forEach {
-        arrangement[$0] = comboIterator.next()!
-      }
-      let candidate = arrangement.chunked(by: ==)
-        .filter { $0.allSatisfy { $0 == "#" } }
-        .map { $0.count }
-      if candidate == pattern {
-        total += 1
-      }
-    }
-  }
-  return total == 0 ? 1 : total
-}
-
 struct InputLine {
   var springs: [String]
   var groups: [Int]
@@ -138,32 +110,8 @@ func parseInput() -> [InputLine] {
     }
 }
 
-func part1() -> Int {
-  let input = readContentsOfFile(named: "Input.txt")!
-    .components(separatedBy: .newlines)
-    .map { $0.split(separator: " ") }
-    .map {(
-      $0[0].map { String($0) },
-      $0[1].components(separatedBy: .decimalDigits.inverted)
-        .map { Int($0)! }
-    )}
-  
-  return input.map { line, groups in
-    countArrangements(in: line, matching: groups)
-  }.reduce(0, +)
-}
-
-func part2() -> Int {
-  let input = parseInput()
-  let newInput = input.map {
-    let springs = Array(repeating: $0.springs, count: 5)
-      .joined(separator: ["?"])
-    let groups = Array(repeating: $0.groups, count: 5)
-      .flatMap { $0 }
-    return InputLine(springs: Array(springs), groups: groups)
-  }
-  
-  return newInput.map { line in
+func sumInput(input: [InputLine]) -> Int {
+  input.map { line in
     var cache = [CacheKey: Int]()
     let result = countArrangementsCached(
       springs: line.springs,
@@ -175,13 +123,30 @@ func part2() -> Int {
   }.reduce(0, +)
 }
 
+func expandInput(input: [InputLine]) -> [InputLine] {
+  input.map {
+    let springs = Array(repeating: $0.springs, count: 5)
+      .joined(separator: ["?"])
+    let groups = Array(repeating: $0.groups, count: 5)
+      .flatMap { $0 }
+    return InputLine(springs: Array(springs), groups: groups)
+  }
+}
+
+func part1() -> Int {
+  let input = parseInput()
+  return sumInput(input: input)
+}
+
+func part2() -> Int {
+  let input = parseInput()
+  return sumInput(input: expandInput(input: input))
+}
+
 @main
 struct Day12 {
   public static func main() {
-    let clock = ContinuousClock()
-    let result2 = clock.measure({
-      print(part2())
-    })
-    print("Part 2 time: \(result2)")
+    print("Part 1: \(part1())")
+    print("Part 2: \(part2())")
   }
 }
