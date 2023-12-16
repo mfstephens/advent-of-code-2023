@@ -1,7 +1,9 @@
 public extension String {
   subscript(randomIndex: Int) -> Character {
-    let index = self.index(self.startIndex, offsetBy: randomIndex)
-    return self[index]
+    get {
+      let index = self.index(self.startIndex, offsetBy: randomIndex)
+      return self[index]
+    }
   }
   
   subscript (r: ClosedRange<Int>) -> String {
