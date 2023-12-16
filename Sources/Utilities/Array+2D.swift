@@ -23,4 +23,41 @@ public extension Array where Element: Collection, Element.Index == Int {
       print(row.map { "\($0)" }.joined(separator: "\t"))
     }
   }
+  
+  func rotatedLeft() -> [[Element.Element]] {
+    guard !self.isEmpty else { return [] }
+    
+    let rowCount = self.count
+    let columnCount = self[0].count
+    
+    var rotatedArray: [[Any?]] = [[Any?]](
+      repeating: [Any?](repeating: nil, count: rowCount),
+      count: columnCount
+    )
+    
+    for i in 0..<rowCount {
+      for j in 0..<columnCount {
+        rotatedArray[columnCount - 1 - j][i] = self[i][j]
+      }
+    }
+    
+    return rotatedArray.compactMap {
+      $0.compactMap { ($0 as! Element.Element)
+      }
+    }
+  }
+}
+
+public extension Array where Element: StringProtocol {
+  func rotatedLeft() -> [String] {
+    let twoD = self.map { $0.map { String($0) } }
+    let rotatedLeft = twoD.rotatedLeft()
+    return rotatedLeft.map { $0.joined() }
+  }
+  
+  func prettyPrinted() {
+    for string in self {
+      print("\(string)")
+    }
+  }
 }
