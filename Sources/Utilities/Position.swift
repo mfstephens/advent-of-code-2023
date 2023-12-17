@@ -12,3 +12,11 @@ public struct Position: Hashable {
     return .init(row: lhs.row + rhs.row, col: lhs.col + rhs.col)
   }
 }
+
+public extension Position {
+  static let north = Position(row: -1, col: 0)
+  static let south = Position(row: 1, col: 0)
+  static let east = Position(row: 0, col: 1)
+  static let west = Position(row: 0, col: -1)
+  static let allDirections = [north, south, east, west]
+}

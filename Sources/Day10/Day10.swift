@@ -8,14 +8,6 @@ struct Tile: Equatable, Hashable {
   let isStart: Bool
 }
 
-extension Position {
-  static let north = Position(row: -1, col: 0)
-  static let south = Position(row: 1, col: 0)
-  static let east = Position(row: 0, col: 1)
-  static let west = Position(row: 0, col: -1)
-  static let allDirections = [north, south, east, west]
-}
-
 func parseInput() -> [[String]] {
   readContentsOfFile(named: "Input.txt")!
     .components(separatedBy: .newlines)
