@@ -1,5 +1,31 @@
 import Foundation
 
+public enum Direction {
+  case north, south, east, west
+  
+  public var perpindicular: (Direction, Direction) {
+    switch self {
+    case .north, .south:
+      return (.east, .west)
+    case .east, .west:
+      return (.north, .south)
+    }
+  }
+  
+  public var axis: Axis {
+    switch self {
+    case .north, .south:
+      return .vertical
+    case .east, .west:
+      return .horizontal
+    }
+  }
+
+  public enum Axis {
+    case vertical, horizontal
+  }
+}
+
 public struct Grid<T> {
   var array: [[T]]
   
@@ -52,9 +78,9 @@ public struct Grid<T> {
     array[i.row][i.col] = temp
   }
   
-  public func prettyPrinted() {
+  public func prettyPrinted(parser: ((T) -> String) = { "\($0)" }) {
     for row in array {
-      print(row.map { "\($0)" }.joined(separator: ""))
+      print(row.map { parser($0) }.joined(separator: ""))
     }
     print("\n")
   }
